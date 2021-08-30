@@ -1,0 +1,25 @@
+{
+  "name": "custom-interface",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@directus/extension-sdk": "^9.0.0-rc.90",
+    "@vue/compiler-sfc": "^3.2.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx directus-extension build"
+  },
+  "directus:extension": {
+    "type": "interface",
+    "path": "index.js",
+    "source": "src/index.js",
+    "host": "9.0.0-rc.90",
+    "hidden": false
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
