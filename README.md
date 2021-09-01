@@ -36,3 +36,13 @@ Open browser and go to localhost:8055
 
 Default login and password is defined in docker-compose.yml as env var for Directus
 
+
+## Development
+
+You need globally installed vue-cli-service: https://cli.vuejs.org/guide/prototyping.html
+
+Then you can simply use `vue-cli-service serve` inside the component folder, or add a proper script in root package.json.
+Example for "custom-interface":
+`"dev:custom-interface": "yarn workspace custom-interface run serve",`
+
+For dev purposes there's an additional file `main.js` in `./src` folder of the component. It's only purpose is to mount the component and serve it with HMR for easier development. 

@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {},
   "devDependencies": {
-    "@directus/extension-sdk": "^9.0.0-rc.90",
-    "@vue/compiler-sfc": "^3.2.4"
+    "@directus/extension-sdk": "^9.0.0-rc.90"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "vue-cli-service serve",
     "build": "npx directus-extension build"
   },
   "directus:extension": {
@@ -18,6 +17,20 @@
     "source": "src/index.js",
     "host": "9.0.0-rc.90",
     "hidden": false
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
   },
   "keywords": [],
   "author": "",
