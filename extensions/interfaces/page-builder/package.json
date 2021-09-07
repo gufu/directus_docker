@@ -1,0 +1,51 @@
+{
+  "name": "page-builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "grapesjs": "0.17.25",
+    "grapesjs-aviary": "0.1.2",
+    "grapesjs-blocks-basic": "0.1.8",
+    "grapesjs-component-countdown": "0.1.3",
+    "grapesjs-navbar": "0.1.5",
+    "grapesjs-plugin-export": "1.0.7",
+    "grapesjs-plugin-filestack": "0.1.1",
+    "grapesjs-plugin-forms": "2.0.1"
+  },
+  "devDependencies": {
+    "@directus/extension-sdk": "^9.0.0-rc.90",
+    "fibers": "5.0.0",
+    "sass": "1.39.0",
+    "sass-loader": "10.2.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "vue-cli-service serve",
+    "build": "npx directus-extension build"
+  },
+  "directus:extension": {
+    "type": "interface",
+    "path": "index.js",
+    "source": "src/index.js",
+    "host": "9.0.0-rc.90",
+    "hidden": false
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

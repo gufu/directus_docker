@@ -14,5 +14,8 @@ export default {
       this.$emit('input', value);
     },
   },
+  mounted() {
+    console.log('mounted value: ', this.value)
+  }
 };
 </script>

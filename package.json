@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "yarn workspaces run build",
-    "dev:custom-interface": "yarn workspace custom-interface run serve"
+    "dev:custom-interface": "yarn workspace custom-interface run serve",
+    "dev:page-builder": "yarn workspace page-builder run serve"
   },
   "author": "",
   "license": "ISC",
