@@ -1,5 +1,6 @@
 import grapesjs from 'grapesjs';
-import pluginBlocks from 'grapesjs-blocks-basic';
+// import pluginBlocks from 'grapesjs-blocks-basic';
+import pluginBlocks from './blocks/basic-blocks';
 import pluginNavbar from 'grapesjs-navbar';
 import pluginCountdown from 'grapesjs-component-countdown';
 import pluginExport from 'grapesjs-plugin-export';
@@ -18,14 +19,20 @@ export default grapesjs.plugins.add('gjs-preset-webpage', (editor, opts = {}) =>
   let defaults = {
     // Which blocks to add
     blocks: [
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
       'link-block',
       'quote',
-      'text-basic'
+      'text-basic',
+      'v-card',
+      'v-card-horizontal-text',
+      'v-card-horizontal-image',
+      'v-card-twitter',
+      'v-card-price-default',
+      'v-card-price-popular'
     ],
 
     canvasCss: `

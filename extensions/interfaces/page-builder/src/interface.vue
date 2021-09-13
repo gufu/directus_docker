@@ -1,98 +1,84 @@
 <template>
-  <div class="container">
-    <div class="panel__top">
-      <div class="panel__basic-actions"></div>
-      <div class="panel__devices"></div>
-      <div class="panel__switcher"></div>
-    </div>
-    <div class="editor-row">
-      <div class="editor-canvas">
-        <div id="gjs">
-          <h1>Hello World Component!</h1>
+  <div>
+    <v-checkbox v-model="enabled" label="Show Page Builder!" />
+    <small>Please note: Page builder content will completely override any other content defined for this page!</small>
+    <div v-show="enabled" class="container">
+      <div class="panel__top">
+        <div class="panel__basic-actions"></div>
+        <div class="panel__devices"></div>
+        <div class="panel__switcher"></div>
+      </div>
+      <div class="editor-row">
+        <div class="editor-canvas">
+          <div id="gjs">
+            <h1>Hello World Component!</h1>
+          </div>
+        </div>
+        <div class="panel__right">
+          <div class="layers-container"></div>
+          <div class="styles-container"></div>
         </div>
       </div>
-      <div class="panel__right">
-        <div class="layers-container"></div>
-        <div class="styles-container"></div>
-      </div>
+      <!--    <div id="blocks"></div>-->
+      <input :value="value" @input="handleChange($event.target.value)" hidden/>
+      <div id="editor"></div>
     </div>
-<!--    <div id="blocks"></div>-->
-    <input :value="value" @input="handleChange($event.target.value)" hidden/>
   </div>
 </template>
 
 <script>
 import grapesjs from 'grapesjs'
+import pluginCkEditor from './lib/ckeditor-plugin'
 import preset from './preset/index'
 import {canvasStyles} from './css/canvas-styles.js'
-// import axios from 'axios'
+import {CKEDITOR_CONFIG} from './lib/ckeditor-config'
+import {addSimpleStorage} from './lib/simple-storage'
+import {wrapCanvas} from './lib/canvas-wrapper'
+import {assetUploadHandler} from './lib/assets-upload'
 
 const config = {}
+let CKEDITOR_LOADED = false
 
 export default {
   emits: ['input'],
   data() {
     return {
+      enabled: !this.isProduction,
       value: this.value,
-      assets: []
+      assets: [],
+      editor: null
     }
   },
   props: {
+    env: {
+      type: String,
+      default: 'production'
+    },
     value: String,
   },
   watch: {
     value: function (newVal, oldVal) {
-      if (newVal && !oldVal) {
+      if(newVal) {
+        this.enabled = true
+      }
+      if (this.editor && newVal && !oldVal) {
         this.editor.load(newVal)
       }
     }
   },
   computed: {
-    preset: () => {
-      return preset.plugin
+    isProduction() {
+      return this.env.toLowerCase() === 'production'
     },
-    editor: () => {
-      return grapesjs.init({
-        container: '#gjs',
-        components: '',
-        plugins: ['gjs-preset-webpage'],
-        pluginsOpts: {
-          'gjs-preset-webpage': {
-            // options
-          }
-        },
-        fromElement: false,
-        // Size of the editor
-        height: '800px',
-        width: '100%',
-        baseCss: canvasStyles,
-        storageManager: {
-          type: 'simple-storage',
-          autosave: true,
-          autoload: false
-        },
-        styleManager: '',
-        assetManager: {
-          upload: '/files?access_token=secret',
-          uploadName: 'files',
-          headers: {},
-          params: {
-            access_token: 'secret'
-          },
-          credentials: 'include',
-          multiUpload: true,
-          autoAdd: 1,
-          dropzone: 1,
-          openAssetsOnDrop: 1
-        }
-      })
+    preset() {
+      return preset.plugin
     }
   },
   methods: {
     /**
      * get asset list from directus and push them to asset manager of the page builder component
      * */
-    addAssetsToList (assets) {
+    addAssetsToList(assets) {
       if (assets) {
         console.log('assets: ', assets)
         for (let asset of assets) {
@@ -112,7 +98,6 @@ export default {
       }
     },
     async getAssets() {
-      console.log('getAssets called')
       const that = this
       this.assets = []
 
@@ -132,76 +117,98 @@ export default {
             console.log('Error Reading data ' + err);
           })
     },
-    async uploadFile(e) {
-      const that = this
-      console.log('this.uploadFile(e)')
-      const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
-      const formData = new FormData();
-      const file = files[0]
-      delete file.metadata
-      formData.append('title', file.name);
-      formData.append('file', file);
-      //TODO: handle credentials to upload/fetch files
-      await fetch('/files?access_token=secret', {
-        method: 'POST',
-        body: formData
+    getEditorInstance () {
+      const isProduction = this.isProduction
+      console.log('isProduction1', isProduction)
+      console.log('isProduction2', this.isProduction)
+      return grapesjs.init({
+        container: '#gjs',
+        components: '',
+        plugins: [
+          'gjs-preset-webpage',
+          pluginCkEditor
+        ],
+        pluginsOpts: {
+          'gjs-preset-webpage': {},
+          'gjs-plugin-ckeditor': CKEDITOR_CONFIG
+        },
+        fromElement: !isProduction,
+        // Size of the editor
+        height: '800px',
+        width: '100%',
+        canvas: {
+          styles: [
+            'https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css'
+          ]
+        },
+        baseCss: canvasStyles,
+        storageManager: {
+          type: 'simple-storage',
+          autosave: true,
+          autoload: false
+        },
+        styleManager: '',
+        assetManager: {
+          upload: isProduction ? '/files?access_token=secret' : '',
+          uploadName: isProduction ? 'files' : '',
+          headers: {},
+          params: {
+            access_token: 'secret'
+          },
+          credentials: 'include',
+          multiUpload: true,
+          autoAdd: 1,
+          dropzone: 1,
+          openAssetsOnDrop: 1
+        }
       })
-          .then(response => {
-            try {
-              return response.json()
-            } catch (e) {
-              return {}
-            }
-          })
-          .then(response => {
-            console.log('uploadFile response: ', response.data)
-            that.addAssetsToList([].push(response.data))
-          })
     },
     init() {
       const that = this
-      const storage = this.editor.StorageManager
-      const assetManager = this.editor.AssetManager
-      assetManager.uploadFile = this.uploadFile
-
-      this.editor.on('asset:upload:end', async (response) => {
-        console.log('asset:upload:end: ', response)
-      })
-
-      this.editor.on('asset:add', async (response) => {
-        console.log('asset:add: ', response)
-      })
-
-      storage.add('simple-storage', {
-        load(keys, clb, clbErr) {
-          const result = {}
-          if (that.value) {
-            const parsed = JSON.parse(that.value)
-            keys.forEach(key => {
-              const value = parsed[key]
-              if (value) {
-                result[key] = value
-              }
-            })
-            clb(result)
-          }
-        },
-        store(data, clb, clbErr) {
-          that.value = data
-          that.$emit('input', data)
-          clb()
+      this.editor = this.getEditorInstance()
+      const editor = this.editor
+      addSimpleStorage(editor, that)
+      this.$nextTick()
+      editor.on('load', function () {
+        wrapCanvas(editor)
+        assetUploadHandler(editor)
+        editor.load(that.value)
+        if(that.value) {
+          that.enabled = true
         }
       })
-      this.$nextTick()
     },
     handleChange(value) {
       this.$emit('input', value)
-    },
+    }
+  },
+  created() {
+
+  },
+  beforeMount() {
+    const script2 = document.createElement('script')
+    script2.type = 'text/javascript'
+    script2.src = 'https://cdn.jsdelivr.net/npm/grapesjs-plugin-ckeditor@0.0.9/dist/grapesjs-plugin-ckeditor.min.js'
+    document.getElementsByTagName('head')[0].appendChild(script2)
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = '//cdn.ckeditor.com/4.16.2/full-all/ckeditor.js'
+    document.getElementsByTagName('head')[0].appendChild(script)
   },
   mounted() {
-    this.init()
-    this.getAssets()
-    this.$nextTick()
+    (async () => {
+      console.log("waiting for variable");
+      while (!window.hasOwnProperty('CKEDITOR')) // define the condition as you like
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("variable is defined");
+      CKEDITOR_LOADED = true
+      this.init()
+      if (this.isProduction) {
+        this.getAssets()
+      }
+      this.$nextTick()
+    })();
   }
 }
 </script>

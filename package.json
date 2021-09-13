@@ -34,5 +34,8 @@
     "create-directus-project": "9.0.0-rc.90",
     "vue": "^3.2.6",
     "core-js": "^3.6.5"
+  },
+  "test": {
+
   }
 }

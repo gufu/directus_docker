@@ -30,6 +30,6 @@ export default (editor, config) => {
   },{
     name: config.textExtra,
     open: false,
-    buildProps: ['transition', 'perspective', 'transform'],
+    buildProps: ['transition', 'transform'],
   }]);
 }

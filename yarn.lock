@@ -4747,6 +4747,11 @@ grapesjs-navbar@0.1.5:
   resolved "https://registry.npmjs.org/grapesjs-navbar/-/grapesjs-navbar-0.1.5.tgz#62e35eca0f391f94d455e96c206b74b5f495fa6e"
   integrity sha512-tVKPtzlTUNCpzk3lHW69II2NsSzLNQd3K32CXssWCP3M1V8fvc9jG/MQECBkd/gMS+DjldD4/4b00ri9F3tKSg==
 
+grapesjs-plugin-ckeditor@0.0.9:
+  version "0.0.9"
+  resolved "https://registry.npmjs.org/grapesjs-plugin-ckeditor/-/grapesjs-plugin-ckeditor-0.0.9.tgz#230057099ce595409f24d2e11cf4ed345c83a360"
+  integrity sha512-QXyAcSwgi09pzigGVS/NsHag5Skuw4zTkVGmEiBN/Qi8KU12/cQBG/OjAcjAB3/ZpToyPoglI33Ydjgj2nJuxQ==
+
 grapesjs-plugin-export@1.0.7:
   version "1.0.7"
   resolved "https://registry.npmjs.org/grapesjs-plugin-export/-/grapesjs-plugin-export-1.0.7.tgz#186728253474d051578a8a5aaf016d8bfac52448"
