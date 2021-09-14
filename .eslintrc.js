@@ -18,13 +18,10 @@ module.exports = {
     'vue'
   ],
   extends: [
-    '@nuxtjs',
     'eslint:recommended',
-    'plugin:nuxt/recommended',
     'plugin:vue/recommended'
   ],
   rules: {
-    'import/order': 'warn',
     'vue/html-indent': ['error', 2, {
       attribute: 1,
       baseIndent: 1,
@@ -50,14 +47,13 @@ module.exports = {
       selfClosingTag: 'never'
     }],
     'vue/singleline-html-element-content-newline': 'off',
-    'nuxt/no-cjs-in-config': 'off',
     // 'cci-dev/vue-html-require-data-automation-id': ['error'],
     quotes: [
       'error',
       'single'
     ],
     semi: [
-      'warn',
+      'error',
       'never'
     ],
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',

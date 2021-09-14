@@ -11,7 +11,12 @@
       <div class="editor-row">
         <div class="editor-canvas">
           <div id="gjs">
-            <h1>Hello World Component!</h1>
+            <!--            <h1>Hello World Component!</h1>-->
+            <div class="row">
+              <div class="col"></div>
+              <div class="col"></div>
+              <div class="col"></div>
+            </div>
           </div>
         </div>
         <div class="panel__right">
@@ -20,7 +25,7 @@
         </div>
       </div>
       <!--    <div id="blocks"></div>-->
-      <input :value="value" @input="handleChange($event.target.value)" hidden/>
+      <input :value="pageBuilderContent" @input="handleChange($event.target.value)" hidden/>
       <div id="editor"></div>
     </div>
   </div>
@@ -28,27 +33,19 @@
 
 <script>
 import grapesjs from 'grapesjs'
-import pluginCkEditor from './lib/ckeditor-plugin'
+import pluginCkEditor from './lib/ckeditor-plugin_wip'
 import preset from './preset/index'
 import {canvasStyles} from './css/canvas-styles.js'
 import {CKEDITOR_CONFIG} from './lib/ckeditor-config'
 import {addSimpleStorage} from './lib/simple-storage'
 import {wrapCanvas} from './lib/canvas-wrapper'
 import {assetUploadHandler} from './lib/assets-upload'
+import {globalExists} from './lib/helpers'
 
 const config = {}
 let CKEDITOR_LOADED = false
 
 export default {
-  emits: ['input'],
-  data() {
-    return {
-      enabled: !this.isProduction,
-      value: this.value,
-      assets: [],
-      editor: null
-    }
-  },
   props: {
     env: {
       type: String,
@@ -56,14 +53,13 @@ export default {
     },
     value: String,
   },
-  watch: {
-    value: function (newVal, oldVal) {
-      if(newVal) {
-        this.enabled = true
-      }
-      if (this.editor && newVal && !oldVal) {
-        this.editor.load(newVal)
-      }
+  emits: ['input'],
+  data() {
+    return {
+      enabled: !this.isProduction,
+      pageBuilderContent: this.value,
+      assets: [],
+      editor: null
     }
   },
   computed: {
@@ -73,6 +69,39 @@ export default {
     preset() {
       return preset.plugin
     }
+  },
+  watch: {
+    pageBuilderContent: function (newVal, oldVal) {
+      if(newVal) {
+        this.enabled = true
+      }
+      if (this.editor && newVal && !oldVal) {
+        this.editor.load(newVal)
+      }
+    }
+  },
+  mounted() {
+    (async () => {
+      while (!globalExists('CKEDITOR')) // define the condition as you like
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      CKEDITOR_LOADED = true
+      this.init()
+      if (this.isProduction) {
+        this.getAssets()
+      }
+      this.$nextTick()
+    })();
+  },
+  beforeMount() {
+    const script2 = document.createElement('script')
+    script2.type = 'text/javascript'
+    script2.src = 'https://cdn.jsdelivr.net/npm/grapesjs-plugin-ckeditor@0.0.9/dist/grapesjs-plugin-ckeditor.min.js'
+    document.getElementsByTagName('head')[0].appendChild(script2)
+
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = '//cdn.ckeditor.com/4.16.2/full-all/ckeditor.js'
+    document.getElementsByTagName('head')[0].appendChild(script)
   },
   methods: {
     /**
@@ -138,7 +167,8 @@ export default {
         width: '100%',
         canvas: {
           styles: [
-            'https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css'
+            'https://cdnjs.cloudflare.com/ajax/libs/vuetify/2.5.8/vuetify.min.css'
+            // 'https://cdn.jsdelivr.netvuetify.min.css/npm/vuetify@2.5.8/dist/vuetify.min.css'
           ]
         },
         baseCss: canvasStyles,
@@ -172,8 +202,8 @@ export default {
       editor.on('load', function () {
         wrapCanvas(editor)
         assetUploadHandler(editor)
-        editor.load(that.value)
-        if(that.value) {
+        editor.load(that.pageBuilderContent)
+        if(that.pageBuilderContent) {
           that.enabled = true
         }
       })
@@ -181,34 +211,6 @@ export default {
     handleChange(value) {
       this.$emit('input', value)
     }
-  },
-  created() {
-
-  },
-  beforeMount() {
-    const script2 = document.createElement('script')
-    script2.type = 'text/javascript'
-    script2.src = 'https://cdn.jsdelivr.net/npm/grapesjs-plugin-ckeditor@0.0.9/dist/grapesjs-plugin-ckeditor.min.js'
-    document.getElementsByTagName('head')[0].appendChild(script2)
-
-    const script = document.createElement('script')
-    script.type = 'text/javascript'
-    script.src = '//cdn.ckeditor.com/4.16.2/full-all/ckeditor.js'
-    document.getElementsByTagName('head')[0].appendChild(script)
-  },
-  mounted() {
-    (async () => {
-      console.log("waiting for variable");
-      while (!window.hasOwnProperty('CKEDITOR')) // define the condition as you like
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log("variable is defined");
-      CKEDITOR_LOADED = true
-      this.init()
-      if (this.isProduction) {
-        this.getAssets()
-      }
-      this.$nextTick()
-    })();
   }
 }
 </script>
